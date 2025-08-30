@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Only Clubhouse</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .nav { display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
+        .message { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .message-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .error { color: red; }
+        .success { color: green; }
+        form { display: flex; flex-direction: column; max-width: 400px; }
+        input, textarea, button { margin-bottom: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div>
+            <a href="/">Home</a>
+            <% if (user) { %>
+                | <a href="/create-message">Create Message</a>
+            <% } %>
+        </div>
+        <div>
+            <% if (user) { %>
+                Hello, <%= user.first_name %>!
+                <% if (!user.membership_status) { %>
+                    | <a href="/join-club">Join Club</a>
+                <% } %>
+                <% if (!user.is_admin) { %>
+                    | <a href="/become-admin">Become Admin</a>
+                <% } %>
+                | <a href="/logout">Logout</a>
+            <% } else { %>
+                <a href="/login">Login</a> | <a href="/signup">Sign Up</a>
+            <% } %>
+        </div>
+    </div>
+
+    <h1>Members Only Clubhouse</h1>
+
+    <% if (!user) { %>
+        <p>Welcome to our exclusive clubhouse! <a href="/signup">Sign up</a> or <a href="/login">log in</a> to see more.</p>
+    <% } %>
+
+    <% if (messages && messages.length > 0) { %>
+        <h2>Messages</h2>
+        <% messages.forEach(message => { %>
+            <div class="message">
+                <h3><%= message.title %></h3>
+                <p><%= message.text %></p>
+                <div class="message-header">
+                    <span>
+                        <% if (message.can_see_author) { %>
+                            By: <%= message.first_name %> <%= message.last_name %> 
+                        <% } else { %>
+                            By: Anonymous
+                        <% } %>
+                    </span>
+                    <span>On: <%= message.formatted_date %></span>
+                </div>
+                <% if (user && user.is_admin) { %>
+                    <form action="/delete-message/<%= message.id %>" method="POST" style="margin-top: 10px;">
+                        <button type="submit" style="background: #ff4444; color: white;">Delete Message</button>
+                    </form>
+                <% } %>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No messages yet. Be the first to <a href="/create-message">create one</a>!</p>
+    <% } %>
+</body>
+</html>

@@ -43,14 +43,14 @@ exports.postBecomeAdmin = async (req, res, next) => {
   if (passcode === process.env.ADMIN_PASSCODE) {
     try {
       await updateAdminStatus(req.user.id);
-      // Update user in session - ONLY if passcode is correct
+      // Update user in session - this only happens if passcode is correct
       req.user.is_admin = true;
       res.redirect('/');
     } catch (err) {
       return next(err);
     }
   } else {
-    // DON'T update user status if passcode is wrong
+    // This executes when passcode is wrong
     res.render('member', { error: 'Incorrect passcode', isAdmin: true });
   }
 };
